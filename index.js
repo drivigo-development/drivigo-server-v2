@@ -86,8 +86,6 @@ app.post('/verify-payment', (req, res) => {
   }
 });
 
-
-
 // Route: subscribe
 app.post('/subscribe', async (req, res) => {
   const { email, name } = req.body;
@@ -107,22 +105,18 @@ app.post('/subscribe', async (req, res) => {
               <body style="margin: 0; padding: 0; background-color: #f9fafb; font-family: Arial, sans-serif; color: #111827;">
                 <div style="max-width: 600px; margin: auto; padding: 20px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb;">
                   
-                  <!-- Logo -->
-                  <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="display: inline-flex; align-items: center; font-size: 2rem; font-weight: 800; color: #111827; margin: 0;">
-                      Drivi
-                      <span style="
-                        background: linear-gradient(135deg, #ffbd40 0%, #e6a22a 100%);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        background-clip: text;
-                        font-family: inherit;
-                      ">
-                        go
-                      </span>
-                    </h1>
-                  </div>
-            
+              <!-- Logo -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="display: inline-flex; align-items: center; font-size: 2rem; font-weight: 800; color: #111827; margin: 0;">
+                  Drivi
+                  <span style="
+                    color: #ffbd40;
+                    font-family: inherit;
+                  ">
+                    go
+                  </span>
+                </h1>
+              </div>            
                   <!-- Title -->
                   <h2 style="margin-bottom: 10px; color: #111827;">Hello ${name},</h2>
             
@@ -197,14 +191,11 @@ app.post('/payment-success-email', async (req, res) => {
     <div style="max-width:600px; margin:auto; padding:20px; background-color:#ffffff; border-radius:8px; border:1px solid #e5e7eb;">
       
       <!-- Logo -->
-      <div style="text-align:center; margin-bottom:30px;">
+      <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="display: inline-flex; align-items: center; font-size: 2rem; font-weight: 800; color: #111827; margin: 0;">
           Drivi
           <span style="
-            background: linear-gradient(135deg, #ffbd40 0%, #e6a22a 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffbd40;
             font-family: inherit;
           ">
             go
@@ -233,11 +224,15 @@ app.post('/payment-success-email', async (req, res) => {
           </tr>
           <tr>
             <th align="left" style="border-bottom:1px solid #d1d5db; padding-bottom:5px;">Start Date</th>
-            <td style="border-bottom:1px solid #d1d5db; padding-bottom:5px;">${new Date(start_date).toLocaleDateString()}</td>
+            <td style="border-bottom:1px solid #d1d5db; padding-bottom:5px;">${new Date(
+              start_date
+            ).toLocaleDateString()}</td>
           </tr>
           <tr>
             <th align="left" style="border-bottom:1px solid #d1d5db; padding-bottom:5px;">Time Slots</th>
-            <td style="border-bottom:1px solid #d1d5db; padding-bottom:5px;">${Array.isArray(time_slots) ? time_slots.join(', ') : time_slots}</td>
+            <td style="border-bottom:1px solid #d1d5db; padding-bottom:5px;">${
+              Array.isArray(time_slots) ? time_slots.join(", ") : time_slots
+            }</td>
           </tr>
           <tr>
             <th align="left">Pickup Location</th>
@@ -293,7 +288,156 @@ app.post('/payment-success-email', async (req, res) => {
   }
 });
 
+// Route: contact-us
+app.post('/contact-us', async (req, res) => {
+  const { fullName, emailAddress, role, message } = req.body;
+  
+  if (!fullName || !emailAddress || !role || !message) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
 
+  try {
+    // Send notification email to admin
+    await transporter.sendMail({
+      from: `"Drivigo" <${process.env.SMTP_USER}>`,
+      to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
+      subject: `New Contact Form Submission from ${role}`,
+      html: `
+        <html>
+          <head>
+            <meta charset="UTF-8" />
+            <title>New Contact Form Submission</title>
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f9fafb; font-family: Arial, sans-serif; color: #111827;">
+            <div style="max-width: 600px; margin: auto; padding: 20px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb;">
+              
+              <!-- Logo -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="display: inline-flex; align-items: center; font-size: 2rem; font-weight: 800; color: #111827; margin: 0;">
+                  Drivi
+                  <span style="
+                    color: #ffbd40;
+                    font-family: inherit;
+                  ">
+                    go
+                  </span>
+                </h1>
+              </div>
+        
+              <!-- Title -->
+              <h2 style="margin-bottom: 10px; color: #111827;">New Contact Form Submission</h2>
+        
+              <!-- Details -->
+              <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; margin-top: 20px;">
+                <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; color: #111827; font-size: 15px;">
+                  <tr>
+                    <th align="left" style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Full Name</th>
+                    <td style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">${fullName}</td>
+                  </tr>
+                  <tr>
+                    <th align="left" style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Email Address</th>
+                    <td style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">${emailAddress}</td>
+                  </tr>
+                  <tr>
+                    <th align="left" style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Role</th>
+                    <td style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">${role}</td>
+                  </tr>
+                  <tr>
+                    <th align="left" style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Message</th>
+                    <td style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">${message}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p style="color: #374151; font-size: 14px; margin-top: 40px;">
+                This is an automated message from the Drivigo contact form.
+              </p>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    // Send confirmation email to the user
+    await transporter.sendMail({
+      from: `"Drivigo" <${process.env.SMTP_USER}>`,
+      to: emailAddress,
+      subject: 'Thank you for contacting Drivigo',
+      html: `
+        <html>
+          <head>
+            <meta charset="UTF-8" />
+            <title>Thank you for contacting Drivigo</title>
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #f9fafb; font-family: Arial, sans-serif; color: #111827;">
+            <div style="max-width: 600px; margin: auto; padding: 20px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e5e7eb;">
+              
+              <!-- Logo -->
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="display: inline-flex; align-items: center; font-size: 2rem; font-weight: 800; color: #111827; margin: 0;">
+                  Drivi
+                  <span style="
+                    background: linear-gradient(135deg, #ffbd40 0%, #e6a22a 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    font-family: inherit;
+                  ">
+                    go
+                  </span>
+                </h1>
+              </div>
+        
+              <!-- Title -->
+              <h2 style="margin-bottom: 10px; color: #111827;">Hello ${fullName},</h2>
+        
+              <!-- Introduction -->
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin: 0 0 15px 0;">
+                Thank you for reaching out to Drivigo! We've received your message and our team will get back to you shortly.
+              </p>
+
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin: 0 0 15px 0;">
+                Here's a summary of the information you provided:
+              </p>
+              
+              <!-- Details -->
+              <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; margin-top: 20px;">
+                <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; color: #111827; font-size: 15px;">
+                  <tr>
+                    <th align="left" style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Role</th>
+                    <td style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">${role}</td>
+                  </tr>
+                  <tr>
+                    <th align="left" style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">Message</th>
+                    <td style="border-bottom: 1px solid #d1d5db; padding-bottom: 5px;">${message}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p style="color: #374151; font-size: 14px; margin-top: 40px;">
+                Thanks for being interested in Drivigo!<br />
+                – The Drivigo Team
+              </p>
+
+              <!-- Footer -->
+              <p style="color: #6b7280; font-size: 14px; line-height: 1.4; margin: 0 0 8px 0;">
+                This is an automated response. Please do not reply to this email.
+              </p>
+              <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">
+                Drivigo • 123 Driving Street, Bengaluru, India
+              </p>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    res.json({ ok: true, message: 'Contact form submitted successfully.' });
+  } catch (err) {
+    console.error('SMTP error:', err);
+    res.status(500).json({ error: 'Failed to process contact form submission.' });
+  }
+});
 
 // Start server
 const PORT = process.env.PORT || 5001;
