@@ -14,6 +14,7 @@ const corsOptions = {
   origin: [
     'http://localhost:5173',
     "https://drivigo.in",
+    "https://www.drivigo.in",
     "https://drivigo-web-v2.vercel.app"
   ],
   methods: ['GET', 'POST'],
